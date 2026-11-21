@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Discover Your Personality Type</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1f2433; --muted:#5b6275; --line:#e4e6ee; --bg:#f6f7fb; --card:#fff;
+  --accent:#3b4cca; --accent-soft:#eef0ff;
+  --nt:#7a5bb5; --nf:#2f9a6b; --sj:#2b8fb8; --sp:#d9a21b;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:24px 20px 60px}
+header.top{display:flex;align-items:center;gap:10px;padding:14px 20px;background:#fff;border-bottom:1px solid var(--line)}
+header.top .dot{width:28px;height:28px;border-radius:50%;background:conic-gradient(var(--nt) 0 25%,var(--nf) 0 50%,var(--sj) 0 75%,var(--sp) 0)}
+header.top b{font-size:18px}
+.screen{display:none}.screen.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:32px}
+h1{font-size:40px;line-height:1.15;margin:0 0 12px}
+h2{font-size:30px;margin:0 0 14px}
+h3{font-size:19px;margin:22px 0 8px}
+.lead{font-size:18px;color:var(--muted)}
+.note{background:#fff8e6;border-left:4px solid var(--sp);padding:14px 18px;border-radius:8px;margin:20px 0}
+.note.blue{background:var(--accent-soft);border-color:var(--accent)}
+.btn{display:inline-block;border:0;border-radius:999px;padding:14px 28px;font:600 16px Inter,sans-serif;cursor:pointer;background:var(--accent);color:#fff;text-decoration:none}
+.btn.ghost{background:#fff;color:var(--accent);border:2px solid var(--accent)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.progress{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:24px}
+.progress i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.qnum{font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;font-size:13px}
+.qtext{font-size:26px;font-weight:700;margin:6px 0 10px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:22px 0}
+.opt{border:2px solid var(--line);border-radius:14px;padding:20px;cursor:pointer;background:#fff;text-align:left;font:inherit;color:inherit;transition:.15s}
+.opt:hover{border-color:var(--accent)}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.opt .t{font-weight:700;font-size:18px;margin-bottom:6px}
+.opt .d{color:var(--muted);font-size:15px}
+.opt .k{display:inline-block;margin-top:10px;font-size:12px;font-weight:700;color:var(--accent);background:#fff;border:1px solid var(--accent);border-radius:99px;padding:2px 10px}
+.nav{display:flex;justify-content:space-between;align-items:center}
+/* Result */
+.hero{border-radius:16px;padding:34px;color:#fff;margin-bottom:22px}
+.hero .code{font-size:64px;font-weight:800;letter-spacing:.04em;line-height:1}
+.hero .name{font-size:26px;font-weight:700;margin-top:6px}
+.hero .grp{opacity:.9;margin-top:4px}
+.letters{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:22px}
+.letters div{background:rgba(255,255,255,.16);border-radius:12px;padding:12px}
+.letters b{font-size:24px;display:block}
+.layout{display:grid;grid-template-columns:300px 1fr;gap:28px;align-items:start}
+.side{position:sticky;top:16px}
+.side h4{font-size:22px;margin:0 0 14px}
+.side button{display:flex;justify-content:space-between;width:100%;padding:16px 18px;border:0;border-bottom:1px solid var(--line);background:#fff;font:500 16px Inter,sans-serif;color:var(--ink);cursor:pointer;text-align:left}
+.side button:first-of-type{border-top:1px solid var(--line)}
+.side button.act{background:#f0f1f6;border-left:4px solid var(--accent);font-weight:600}
+.side .ext{margin-top:16px;font-size:14px}
+.content h2{font-size:40px;border-bottom:1px solid var(--line);padding-bottom:14px}
+.content .kicker{font-weight:700;color:var(--muted);text-transform:uppercase;font-size:14px;letter-spacing:.04em;margin-top:18px}
+.content p,.content li{font-size:17px}
+.pull{border-left:4px solid var(--accent);padding:6px 0 6px 22px;margin:24px 0;font-size:24px;font-weight:700}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.box{border:1px solid var(--line);border-radius:12px;padding:16px 20px;background:#fff}
+.box.g{border-top:4px solid var(--nf)} .box.r{border-top:4px solid #d0553f}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.tags span{background:var(--accent-soft);color:var(--accent);border-radius:99px;padding:6px 14px;font-weight:600;font-size:14px}
+.pager{display:flex;justify-content:space-between;margin-top:30px;gap:10px;flex-wrap:wrap}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 22px}
+select{padding:10px 14px;border-radius:10px;border:1px solid var(--line);font:500 15px Inter,sans-serif}
+.small{font-size:13px;color:var(--muted)}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:22px 0 12px}
+.fields label{font-weight:600;font-size:15px}
+.fields input{display:block;width:100%;margin-top:6px;padding:13px 14px;border:1.5px solid var(--line);border-radius:10px;font:500 16px Inter,sans-serif}
+.fields input:focus{outline:none;border-color:var(--accent)}
+.consent{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--muted);margin-bottom:6px}
+.consent input{margin-top:4px;width:18px;height:18px}
+.err{color:#c0392b;font-weight:600;min-height:22px;margin:4px 0 12px}
+.submitbox{background:#fff;border:2px dashed var(--accent);border-radius:14px;padding:18px 22px;margin-bottom:22px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.submitbox.done{border-style:solid;border-color:var(--nf);background:#eefaf3}
+.rare-stat{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0}
+.rare-stat div{background:var(--accent-soft);border-radius:12px;padding:16px;text-align:center}
+.rare-stat b{display:block;font-size:30px;color:var(--accent)}
+.rrow{display:grid;grid-template-columns:64px 1fr 62px;gap:12px;align-items:center;margin:7px 0;font-weight:600}
+.rrow .track{height:22px;background:#ececf2;border-radius:99px;overflow:hidden}
+.rrow .fill{height:100%;border-radius:99px}
+.rrow.me{background:#fff6d6;border-radius:8px;padding:4px 6px;margin-left:-6px;margin-right:-6px}
+.rrow .pct{text-align:right}
+@media(max-width:820px){.fields,.rare-stat{grid-template-columns:1fr}}
+@media(max-width:820px){
+  .opts,.two,.layout{grid-template-columns:1fr}
+  .letters{grid-template-columns:1fr 1fr}
+  .side{position:static}
+  h1{font-size:30px}.content h2{font-size:30px}.hero .code{font-size:48px}
+}
+</style>
+</head>
+<body>
+<header class="top"><span class="dot"></span><b>Personality Type Finder</b></header>
+<div class="wrap">
+
+<!-- START -->
+<section class="screen on" id="s-start">
+  <div class="card">
+    <h1>Discover your personality type</h1>
+    <p class="lead">Four quick questions. One of 16 personality types, based on the Myers-Briggs preference pairs.</p>
+    <div class="note">
+      <b>Before you begin: think back to who you were up to the age of 21.</b><br>
+      Answer the way you naturally thought, spoke and behaved then, not how you behave today.
+      As we grow, most of us consciously work on our weaker sides and become more balanced: the quiet person learns to speak up, the impulsive one learns to plan. That growth is valuable, but it hides our natural preference. Your <i>true</i> type shows most clearly in your thinking and actions before age 21.
+    </div>
+    <div class="note blue">There are no right or wrong answers. Pick the option that fits you <b>most of the time</b>, even if both feel partly true.</div>
+    <div class="fields">
+      <label>Your full name<input id="fName" type="text" autocomplete="name" placeholder="e.g. Priya Sharma"></label>
+      <label>Contact number<input id="fPhone" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number"></label>
+    </div>
+    <label class="consent"><input type="checkbox" id="fConsent"> I agree that my name, contact number and quiz result may be recorded and used for research on personality types. My details will be kept confidential, will not be shared with third parties, and will appear only in aggregated, anonymised findings.</label>
+    <p class="err" id="fErr"></p>
+    <button class="btn" onclick="startQuiz()">Start the quiz →</button>
+  </div>
+</section>
+
+<!-- QUESTION -->
+<section class="screen" id="s-q">
+  <div class="card">
+    <div class="progress"><i id="bar"></i></div>
+    <div class="qnum" id="qnum"></div>
+    <div class="qtext" id="qtext"></div>
+    <p class="lead" id="qhelp"></p>
+    <div class="opts" id="opts"></div>
+    <div class="nav">
+      <button class="btn ghost" onclick="back()">← Back</button>
+      <button class="btn" id="next" onclick="next()" disabled>Next →</button>
+    </div>
+  </div>
+</section>
+
+<!-- SUBMIT (result hidden until submitted) -->
+<section class="screen" id="s-submit">
+  <div class="card" style="text-align:center">
+    <div class="progress"><i style="width:100%"></i></div>
+    <h2>All done! Your result is ready.</h2>
+    <p class="lead">Submit your responses to unlock your personality type.</p>
+    <div class="note blue" style="text-align:left" id="submitNote"></div>
+    <div class="note" id="blockedMsg" style="display:none;text-align:left;border-color:#c0392b;background:#fdecea">
+      <b>Your responses could not be submitted from this window.</b><br>
+      This usually happens when the quiz is opened inside WhatsApp, Mail or a file preview. Please open the quiz link in <b>Safari or Chrome</b> and try again. Your result will unlock once your responses are submitted.
+    </div>
+    <div class="nav" style="justify-content:center;gap:14px;flex-wrap:wrap">
+      <button class="btn ghost" onclick="step=Q.length-1;renderQ();show('s-q')">← Review answers</button>
+      <a class="btn" id="unlockBtn" href="#" target="_blank" rel="noopener">Submit &amp; see my result →</a>
+    </div>
+  </div>
+</section>
+
+<!-- RESULT -->
+<section class="screen" id="s-res">
+  <div class="toolbar">
+    <button class="btn ghost" onclick="restart()">↺ Retake quiz</button>
+    <label class="small">Explore another type:
+      <select id="typeSel" onchange="showType(this.value,true)"></select>
+    </label>
+  </div>
+  <div class="hero" id="hero"></div>
+  <div id="submitWrap"></div>
+  <div class="layout">
+    <aside class="side">
+      <h4>Explore This Type</h4>
+      <div id="sideNav"></div>
+      <div class="ext small" id="extLink"></div>
+    </aside>
+    <main class="content card" id="content"></main>
+  </div>
+  <p class="small" style="margin-top:28px">This four-question quiz gives an indicative type for self-reflection and team conversations. It is not a validated psychometric assessment and should not be used for hiring, selection or any other decision about a person.</p>
+</section>
+
+</div>
+
+<script>
+const Q = [
+  {dim:"Energy", q:"Are you an Introvert or an Extrovert?",
+   help:"Think about how you spoke and reacted up to age 21. Did you think things through before you spoke, or speak first and reflect later?",
+   a:{t:"Introvert", d:"I thought a lot before saying anything. I processed things in my head first, and then spoke.", l:"I"},
+   b:{t:"Extrovert", d:"I was spontaneous. I spoke or acted first and thought about it afterwards.", l:"E"}},
+  {dim:"Mind", q:"Do you deep-dive into things, or look at them from a broader perspective?",
+   help:"Think about how you did things: schoolwork, hobbies, tasks at home.",
+   a:{t:"Deep dive into detail", d:"I went into the detail of everything. Perfection mattered to me, and I relied on the right process or method of doing things.", l:"S"},
+   b:{t:"Broader perspective", d:"I thought about the big picture. My actions were focused on the result and the vision, not every step of the process.", l:"N"}},
+  {dim:"Nature", q:"Are you emotional or logical?",
+   help:"Think about how you made decisions. What drove your actions?",
+   a:{t:"Emotional", d:"My actions were driven by feelings, both mine and other people's. I asked, 'How will this affect people?'", l:"F"},
+   b:{t:"Logical", d:"My actions were driven by logic. I asked, 'What makes the most sense, and what is fair and correct?'", l:"T"}},
+  {dim:"Tactics", q:"Do you stick to one thing, or keep your options open?",
+   help:"Think about how you handled plans and decisions.",
+   a:{t:"Stick to my decisions", d:"Once I decided, I stuck to it. I liked things planned, settled and closed.", l:"J"},
+   b:{t:"Keep my options open", d:"I kept my options open and took my time to decide. I liked flexibility and adapting as I went.", l:"P"}}
+];
+const LETTER = {
+  I:["Introverted","Recharges in solitude; thinks before speaking."],
+  E:["Extroverted","Recharges with people; speaks and acts, then reflects."],
+  S:["Sensing (Observant)","Focuses on detail, facts and proven process."],
+  N:["Intuitive","Focuses on the big picture, patterns and vision."],
+  F:["Feeling","Decides with values and the impact on people."],
+  T:["Thinking","Decides with logic and objective criteria."],
+  J:["Judging","Prefers plans, closure and sticking to decisions."],
+  P:["Perceiving","Prefers flexibility, options and adapting."]
+};
+const GROUPS = {
+  NT:["Analysts","var(--nt)"], NF:["Diplomats","var(--nf)"],
+  SJ:["Sentinels","var(--sj)"], SP:["Explorers","var(--sp)"]
+};
+function groupOf(c){ return c[1]==="N" ? (c[2]==="T"?"NT":"NF") : (c[3]==="J"?"SJ":"SP"); }
+
+const T = {
+INTJ:{name:"The Strategist",tag:"Sees the long game and builds the plan to win it.",
+ intro:"INTJs are independent, long-range planners who naturally see systems and how to improve them. They trust logic over convention and prefer to work things out fully in their own heads before sharing. Their inner world is rich, private and highly organised.",
+ more:"They are lifelong self-learners who set very high standards for themselves and others. They are comfortable working alone and are rarely swayed by popularity or tradition. What wins them over is a well-reasoned argument.",
+ s:["Strategic: sees several moves ahead","Independent: decides without needing crowd approval","Determined: carries plans through to completion","Curious: constantly learning and improving"],
+ w:["Can come across as arrogant or dismissive","Impatient with emotion-led reasoning","Over-analyses relationships and people","Resists rules they find illogical"],
+ love:"INTJs approach relationships deliberately, looking for a partner who matches them intellectually and shares their values. They are slow to open up, but once committed they are deeply loyal and invest in making the relationship work. Their growth area is remembering that feelings don't always need to be solved; sometimes they only need to be heard.",
+ friend:"They keep a small circle of carefully chosen friends and prefer depth to small talk. They value friends who challenge their ideas honestly and respect their need for space.",
+ parent:"As parents, INTJs raise independent, thinking children. They encourage questions and self-reliance. They may need to consciously show warmth and patience during emotional moments rather than jumping to solutions.",
+ careers:["Strategy & planning","Data & analytics","Engineering & architecture","Research","Finance & investment","Process excellence"],
+ cnote:"They thrive where they can design systems and work with autonomy. Roles built on constant socialising or rigid hierarchy drain them.",
+ col:"Wants to be judged on competence, and may skip office chatter to focus on the work.",
+ mgr:"Sets a clear vision and high standards, and expects people to work independently.",
+ sub:"Respects capable managers and pushes back against micromanagement or illogical instructions.",
+ grow:["Explain the 'why' behind your conclusions","Ask for others' views before deciding","Make deliberate time for relationships"]},
+
+INTP:{name:"The Thinker",tag:"Endlessly curious about how and why things work.",
+ intro:"INTPs are inventive, analytical minds who love ideas, theories and patterns. They question everything and enjoy finding the hidden flaw in an argument. Often absorbed in thought, they can seem detached, but they are quietly passionate about understanding the world.",
+ more:"They value precision in thinking and language, and are more interested in a good idea than in who suggested it. Routine and paperwork bore them. Puzzles energise them.",
+ s:["Analytical: breaks complex problems down","Original: finds unconventional solutions","Open-minded: welcomes new evidence","Objective: honest, even when it is inconvenient"],
+ w:["Absent-minded or lost in thought","Can seem insensitive to feelings","Keeps tweaking instead of finishing","Struggles with routine and follow-through"],
+ love:"INTPs see a partner as someone to explore ideas with. They show love through attention, curiosity and solving problems, rather than through grand gestures. Expressing emotion can feel awkward, so a patient partner helps them open up.",
+ friend:"Their friendships are relaxed and low-maintenance, built on shared interests, debates and humour. They don't need constant contact to stay close.",
+ parent:"INTP parents encourage curiosity and let children explore and question. They tend to be relaxed about rules, so they may need to add routine and structure deliberately.",
+ careers:["Software & technology","Research & science","Systems analysis","Product design","Academia","Technical writing"],
+ cnote:"They need intellectual challenge and flexibility, and they dislike repetitive administrative work.",
+ col:"Brings fresh ideas and sharp analysis, and may resist unnecessary meetings.",
+ mgr:"Gives people freedom, but may neglect follow-up and structure.",
+ sub:"Works best when given a clear problem and freedom over the method.",
+ grow:["Close loops: finish before starting something new","Say your appreciation out loud","Build simple daily routines"]},
+
+ENTJ:{name:"The Commander",tag:"Sees the goal, organises the team, drives the result.",
+ intro:"ENTJs are bold, decisive leaders who spot inefficiency and want to fix it right away. They set ambitious goals, organise people and resources, and drive towards results. Challenge energises them, and they are comfortable taking charge.",
+ more:"They think strategically and act quickly, and they respect competence and directness. In their eyes, a problem is just a project waiting for a plan.",
+ s:["Efficient: removes waste and delay","Confident: comfortable making the call","Strong-willed: persists through obstacles","Strategic and charismatic: rallies people"],
+ w:["Stubborn and can dominate discussions","Intolerant of slowness or indecision","Impatient with people's pace","Can appear cold or ruthless"],
+ love:"ENTJs take relationships seriously and invest real effort in them. They want a partner who is ambitious and growing too. Their growth area is slowing down to listen rather than direct.",
+ friend:"They are drawn to friends who share their drive and enjoy stimulating debate. They are often the organiser of the group.",
+ parent:"ENTJ parents set high expectations and clear structure, and teach responsibility early. They need to make room for their children's emotions and natural pace.",
+ careers:["Business leadership","Entrepreneurship","Operations head","Management consulting","Sales leadership","Law"],
+ cnote:"They thrive in roles with authority, accountability and measurable goals.",
+ col:"Takes initiative and sets the pace, sometimes faster than others like.",
+ mgr:"Decisive, results-focused and a strong delegator, though they can be tough.",
+ sub:"Hard-working and growth-hungry, and will question inefficient instructions.",
+ grow:["Ask before directing","Acknowledge effort, not just results","Accept that people move at different speeds"]},
+
+ENTP:{name:"The Challenger",tag:"Questions everything and enjoys the debate.",
+ intro:"ENTPs are quick-witted, energetic idea-generators who love a good argument and enjoy challenging the status quo. They see possibilities everywhere and get bored by 'this is how we've always done it.'",
+ more:"They learn fast, connect unrelated ideas and enjoy playing devil's advocate. To them, a debate is a way of testing ideas, not a personal attack.",
+ s:["Knowledgeable across many topics","Quick thinker under pressure","Original and inventive","Excellent brainstormer"],
+ w:["Argumentative","Can be insensitive in debate","Intolerant of routine","Struggles to focus and finish"],
+ love:"ENTPs are fun, spontaneous partners who keep the relationship growing and interesting. They may test a partner through debate. Their growth area is following through on everyday commitments.",
+ friend:"They have large, varied circles of friends and love banter. Their friendships thrive on new ideas and shared adventures.",
+ parent:"ENTP parents encourage independent thinking and healthy debate at home. They are flexible, but they may need to provide more consistency and discipline.",
+ careers:["Entrepreneurship","Marketing & advertising","Consulting","Product innovation","Journalism","Law & negotiation"],
+ cnote:"They need variety, intellectual freedom and room to experiment.",
+ col:"Energises brainstorming and challenges assumptions.",
+ mgr:"Visionary and open to ideas, but may leave the details to others.",
+ sub:"Needs freedom and variety, and will question rules that make no sense.",
+ grow:["Pick fewer ideas and finish them","Check whether a debate is welcome","Follow through on the details"]},
+
+INFJ:{name:"The Counsellor",tag:"A quiet idealist who understands people deeply.",
+ intro:"INFJs are quiet idealists with strong principles and deep insight into people. They want their work and life to mean something, and they often sense others' feelings before a word is spoken.",
+ more:"They combine vision with determination. Once they believe in a cause, they work steadily and privately to make it real. Few people get to see their inner world.",
+ s:["Insightful about people and motives","Principled and values-driven","Passionate about meaningful causes","Altruistic: wants to help others grow"],
+ w:["Sensitive to criticism","Perfectionist","Reluctant to open up","Prone to burnout from giving too much"],
+ love:"INFJs seek a deep, authentic connection rather than a casual one. They are slow to choose a partner but very devoted once they do, and they need a partner who values meaning and honesty.",
+ friend:"They keep a few close friends and are excellent listeners. They may withdraw for a while when they feel drained.",
+ parent:"INFJ parents are warm, nurturing and values-driven, and they help children understand their feelings. They may find firm discipline difficult.",
+ careers:["Counselling & coaching","HR and L&D","Teaching","Writing","NGO & social work","Healthcare"],
+ cnote:"They thrive when their work aligns with their values and helps people.",
+ col:"Supportive and harmony-seeking; notices when someone is struggling.",
+ mgr:"Inspires through purpose and cares about the team's growth, but may avoid conflict.",
+ sub:"Wants meaningful work and genuine appreciation.",
+ grow:["Set boundaries early","Raise disagreements before they build up","Accept 'good enough'"]},
+
+INFP:{name:"The Idealist",tag:"Guided by inner values; imaginative and kind.",
+ intro:"INFPs are gentle, imaginative people guided by a strong inner set of values. They look for meaning, authenticity and harmony, and they often express themselves through creativity.",
+ more:"They may look calm on the outside, but their inner life is intense. They care deeply about doing what feels right and about people being true to themselves.",
+ s:["Empathetic","Creative and imaginative","Open-minded and accepting","Passionate about their values"],
+ w:["Can be unrealistic","Very self-critical","Avoids conflict","Can be impractical with routine tasks"],
+ love:"INFPs are romantic and devoted partners who may idealise the person they love. They need emotional depth and the freedom to be themselves.",
+ friend:"They are loyal and accepting friends with a small circle, and they value authenticity over popularity.",
+ parent:"INFP parents are supportive and accepting, and they encourage self-expression. Enforcing rules may be hard for them.",
+ careers:["Writing & content","Design & arts","Counselling","Teaching","NGO work","Employee engagement"],
+ cnote:"They need work that aligns with their values and allows creativity.",
+ col:"Cooperative and values harmony in the team.",
+ mgr:"Encouraging and democratic, but dislikes making tough calls.",
+ sub:"Needs work that fits their values, and is hurt by harsh criticism.",
+ grow:["Turn ideals into small, concrete steps","Treat feedback as information, not a judgement","Address conflict early"]},
+
+ENFJ:{name:"The Mentor",tag:"Brings out the best in people and rallies them together.",
+ intro:"ENFJs are warm, persuasive leaders who bring out the best in others. They notice people's potential and naturally rally groups around a shared purpose.",
+ more:"They are energised by helping people grow and feel genuine joy at others' success. People trust them because their care is real.",
+ s:["Receptive to others' needs","Reliable","Inspiring communicator","Natural leader"],
+ w:["Overly idealistic","Too selfless","Over-sensitive","Needs approval"],
+ love:"ENFJs are committed, giving partners who work hard at the relationship. They need to avoid trying to 'improve' their partner.",
+ friend:"They are generous friends who organise get-togethers and keep people connected.",
+ parent:"ENFJ parents are encouraging and involved, and want their children to reach their potential. They need to avoid steering too much.",
+ careers:["Training & L&D","Teaching","HR leadership","Client relations","Public relations","Coaching"],
+ cnote:"They thrive in roles that develop people and build communities.",
+ col:"A team builder and motivator.",
+ mgr:"Motivating and people-centred, but may avoid giving tough feedback.",
+ sub:"Committed and eager to help, and needs recognition.",
+ grow:["Look after your own needs too","Let people choose their own path","Give honest feedback even when it is uncomfortable"]},
+
+ENFP:{name:"The Campaigner",tag:"An enthusiastic free spirit who sees possibility in everyone.",
+ intro:"ENFPs are enthusiastic, creative free spirits who connect easily and see possibility in everyone. They bring energy and optimism wherever they go.",
+ more:"They are driven by curiosity and meaning, and they love new people, ideas and experiences. Routine feels like a cage to them.",
+ s:["Curious","Perceptive about people","Enthusiastic","Excellent communicator"],
+ w:["People-pleasing","Unfocused","Disorganised","Overthinks and gets emotional"],
+ love:"ENFPs are playful, affectionate partners who want a deep emotional connection. They may lose interest once routine sets in.",
+ friend:"They have many friends and take a genuine interest in each of them. They are great fun to be around.",
+ parent:"ENFP parents are fun and warm, and they encourage creativity. They need to add structure.",
+ careers:["Marketing & branding","Training & facilitation","Journalism","Event management","Entrepreneurship","Counselling"],
+ cnote:"They need variety, people and room for ideas.",
+ col:"Brings energy and fresh ideas.",
+ mgr:"Inspiring and flexible, but may skip process.",
+ sub:"Needs freedom and variety, and struggles with detail-heavy work.",
+ grow:["Use lists and deadlines","Learn to say no","Finish one idea before chasing the next"]},
+
+ISTJ:{name:"The Inspector",tag:"Dependable, practical and true to their word.",
+ intro:"ISTJs are responsible, practical, fact-based people who value duty, order and keeping their promises. They are the dependable backbone of any organisation.",
+ more:"They respect proven methods, clear rules and honest work. When they say something will be done, it gets done.",
+ s:["Honest and direct","Dutiful","Very responsible","Calm, practical and organised"],
+ w:["Stubborn","Can seem insensitive","Goes strictly by the book","Takes too much on themselves"],
+ love:"ISTJs are stable, committed partners who show love through reliability and practical actions.",
+ friend:"They keep a small number of long-lasting friendships built on trust.",
+ parent:"ISTJ parents provide structure, rules and stability, and teach responsibility. They need to flex for each child's individuality.",
+ careers:["Accounting & audit","Operations & logistics","Compliance","Administration","Supply chain","Quality control"],
+ cnote:"They thrive with clear expectations, structure and measurable standards.",
+ col:"Dependable and meets every deadline.",
+ mgr:"Sets clear rules and is fair and structured, but may resist change.",
+ sub:"Follows procedures and wants clear expectations.",
+ grow:["Try new methods","Express appreciation","Delegate"]},
+
+ISFJ:{name:"The Protector",tag:"Quietly caring; keeps everything and everyone running.",
+ intro:"ISFJs are caring, loyal and detail-minded people who quietly look after others. They remember what matters to people and keep things running smoothly in the background.",
+ more:"They show care through practical help. Their hard work often goes unnoticed because they rarely ask for credit.",
+ s:["Supportive","Reliable and patient","Observant","Hard-working and loyal"],
+ w:["Overly humble","Takes things personally","Bottles up feelings","Overloads themselves and resists change"],
+ love:"ISFJs are devoted, attentive partners who express love through care. They need to feel appreciated.",
+ friend:"They are loyal friends who remember small details, and they often give more than they take.",
+ parent:"ISFJ parents are nurturing, protective and dutiful, and they may overprotect.",
+ careers:["Healthcare & nursing","HR & administration","Customer service","Primary teaching","Office management","Social work"],
+ cnote:"They thrive where care, accuracy and loyalty are valued.",
+ col:"Helpful and steady.",
+ mgr:"Supportive and attentive, but may avoid conflict.",
+ sub:"Diligent, and needs appreciation.",
+ grow:["Learn to say no","Ask for the credit you've earned","Welcome change"]},
+
+ESTJ:{name:"The Supervisor",tag:"Brings order, sets rules and leads by example.",
+ intro:"ESTJs are organised, decisive and practical people who bring order and like clear rules. They lead by example and value tradition and hard work.",
+ more:"They believe in doing the right thing the right way, and they are not afraid to step up and take charge.",
+ s:["Dedicated","Strong-willed","Direct and honest","Excellent organiser"],
+ w:["Inflexible","Uncomfortable with unconventional situations","Judgemental","Finds it hard to express emotion"],
+ love:"ESTJs are committed, traditional partners with clear expectations.",
+ friend:"They organise events and are dependable friends. They like friends who share their values.",
+ parent:"ESTJ parents run a structured home with rules and discipline. They need to show warmth too.",
+ careers:["Operations management","Retail store management","Banking","Project management","Defence & police","Administration"],
+ cnote:"They thrive in structured environments with clear authority.",
+ col:"Takes charge.",
+ mgr:"Sets clear roles and accountability, but may be rigid.",
+ sub:"Respects hierarchy and follows through.",
+ grow:["Listen to views that differ from yours","Offer emotional support","Stay open to new ways"]},
+
+ESFJ:{name:"The Host",tag:"Warm, sociable and always looking out for others.",
+ intro:"ESFJs are warm, sociable and helpful people who care about harmony and the wellbeing of others. They notice needs and act quickly to meet them.",
+ more:"They thrive on community, enjoy bringing people together, and take their responsibilities seriously.",
+ s:["Practical","Loyal","Warm and sensitive","Good at connecting people"],
+ w:["Worried about approval","Inflexible","Reluctant to innovate","Vulnerable to criticism"],
+ love:"ESFJs are caring, generous and traditional partners who need reassurance.",
+ friend:"They are the social glue of a group and remember everyone's birthday.",
+ parent:"ESFJ parents are involved and caring and provide structure. They may worry about what others think.",
+ careers:["Customer relations","Employee engagement","Teaching","Healthcare","Hospitality","Sales"],
+ cnote:"They thrive in people-facing, organised roles.",
+ col:"Builds team spirit.",
+ mgr:"Fair, organised and people-focused, but dislikes conflict.",
+ sub:"Cooperative, and wants clear guidance and appreciation.",
+ grow:["Stop relying on approval","Treat criticism as information","Try new approaches"]},
+
+ISTP:{name:"The Craftsman",tag:"A calm, hands-on problem-solver.",
+ intro:"ISTPs are bold, practical problem-solvers who love to understand how things work, often by taking them apart. They are calm in a crisis and prefer action to talk.",
+ more:"They learn by doing, value efficiency, and enjoy the freedom to handle things their own way.",
+ s:["Optimistic and energetic","Creative and practical","Spontaneous","Relaxed in a crisis"],
+ w:["Stubborn","Can seem insensitive","Private","Easily bored and wary of commitment"],
+ love:"ISTPs need space in a relationship. They show love by doing things and may avoid emotional talk.",
+ friend:"Their friendships are easy-going and built around shared activities.",
+ parent:"ISTP parents are relaxed and let children explore and learn by doing. Expressing emotion is harder for them.",
+ careers:["Mechanical & technical","Engineering","IT support","Logistics & fleet","Emergency services","Skilled trades"],
+ cnote:"They thrive in hands-on, problem-solving work with autonomy.",
+ col:"Hands-on and efficient.",
+ mgr:"Lets the team work independently and keeps rules light.",
+ sub:"Wants autonomy and dislikes bureaucracy.",
+ grow:["Plan ahead","Share your feelings","Respect others' need for structure"]},
+
+ISFP:{name:"The Artist",tag:"Gentle, sensitive and lives in the moment.",
+ intro:"ISFPs are gentle, flexible and sensitive people who live in the moment and express themselves through action and aesthetics.",
+ more:"They have a strong eye for beauty and a quiet independence, and prefer to show their values rather than talk about them.",
+ s:["Charming","Sensitive to others","Imaginative","Passionate and curious"],
+ w:["Fiercely independent","Unpredictable","Easily stressed","Fluctuating self-esteem"],
+ love:"ISFPs are warm, spontaneous partners who show love through actions.",
+ friend:"They are accepting friends with a few close bonds.",
+ parent:"ISFP parents are warm and free-spirited and encourage expression. They may lack consistent discipline.",
+ careers:["Visual merchandising & design","Fashion","Photography","Culinary arts","Healthcare","Animal care"],
+ cnote:"They thrive in creative, hands-on work with freedom.",
+ col:"Easy-going.",
+ mgr:"Flexible and supportive.",
+ sub:"Needs freedom and appreciation.",
+ grow:["Plan for the long term","Speak up","Face conflict rather than avoid it"]},
+
+ESTP:{name:"The Dynamo",tag:"An action-first risk-taker who solves problems on the spot.",
+ intro:"ESTPs are energetic, action-oriented and perceptive people who live in the moment, enjoy risk and solve problems on the spot.",
+ more:"They read situations and people quickly and prefer doing to discussing. They are at their best when things move fast.",
+ s:["Bold","Rational and practical","Perceptive","Direct and sociable"],
+ w:["Impatient","Takes risks","Unstructured","May miss the bigger picture"],
+ love:"ESTPs are exciting, spontaneous partners who may struggle with long-term planning.",
+ friend:"They are the life of the party and have many friends.",
+ parent:"ESTP parents are fun and active, with relaxed rules.",
+ careers:["Sales","Entrepreneurship","Field operations","Sports","Emergency services","Negotiation"],
+ cnote:"They thrive in fast-paced, results-driven roles.",
+ col:"Energetic.",
+ mgr:"Action-focused and practical.",
+ sub:"Needs variety and quick results.",
+ grow:["Think through consequences","Finish what you start","Listen before acting"]},
+
+ESFP:{name:"The Performer",tag:"Spontaneous and fun-loving; brings life to any room.",
+ intro:"ESFPs are spontaneous, energetic and fun-loving people who enjoy people and the present moment. They bring life to any room.",
+ more:"They are practical, observant and generous, and they love making others happy.",
+ s:["Bold","Original","Aesthetic sense","Observant, with excellent people skills"],
+ w:["Sensitive","Avoids conflict","Easily bored","Plans poorly for the long term"],
+ love:"ESFPs are fun, generous partners who need excitement.",
+ friend:"They are very social and inclusive.",
+ parent:"ESFP parents are playful and fun, and they need to add structure.",
+ careers:["Retail & customer experience","Hospitality & events","Sales","Entertainment","Training delivery","Healthcare"],
+ cnote:"They thrive in lively, people-facing roles.",
+ col:"Lively.",
+ mgr:"Supportive and hands-on.",
+ sub:"Enthusiastic, and needs variety and feedback.",
+ grow:["Plan and save","Handle conflict directly","Focus on one thing at a time"]}
+};
+
+/* ===== Google Form recording =====
+   Paste your form's ID and the entry IDs of its three fields below.
+   (Google Form → ⋮ → Get pre-filled link → fill in NAME / PHONE / TYPE → copy the link.) */
+const FORM = { id:"1FAIpQLSe86r_iwRZJZFV9SuTJxXcX2UGfDzcQSaJOZGl7gkUXW6vWIw", name:"530973323", phone:"1499652502", type:"293530687" };
+
+/* Population share of each type (MBTI Manual, US national sample) */
+const RARITY = {INFJ:1.5,ENTJ:1.8,INTJ:2.1,ENFJ:2.5,ENTP:3.2,INTP:3.3,ESTP:4.3,INFP:4.4,ISTP:5.4,ENFP:8.1,ESFP:8.5,ESTJ:8.7,ISFP:8.8,ISTJ:11.6,ESFJ:12.3,ISFJ:13.8};
+
+let person = {name:"", phone:""}, fromQuiz=false, submitted=false;
+function startQuiz(){
+  const n=document.getElementById('fName').value.trim();
+  const p=document.getElementById('fPhone').value.replace(/\D/g,'');
+  const c=document.getElementById('fConsent').checked;
+  const e=document.getElementById('fErr');
+  if(n.length<2){e.textContent="Please enter your full name.";return;}
+  if(!/^[6-9]\d{9}$/.test(p)){e.textContent="Please enter a valid 10-digit mobile number.";return;}
+  if(!c){e.textContent="Please tick the consent box to continue.";return;}
+  e.textContent=""; person={name:n,phone:p}; submitted=false; go(0);
+}
+function formLink(code){
+  if(!FORM.id) return null;
+  const q=new URLSearchParams();
+  q.set('entry.'+FORM.name,person.name); q.set('entry.'+FORM.phone,person.phone); q.set('entry.'+FORM.type,code+' - '+T[code].name);
+  q.set('submit','Submit');
+  return `https://docs.google.com/forms/d/e/${FORM.id}/formResponse?`+q.toString();
+}
+function renderSubmit(code){
+  const w=document.getElementById('submitWrap');
+  if(!fromQuiz){w.innerHTML='';return;}
+  const link=formLink(code);
+  if(!link){w.innerHTML='';return;}
+  w.innerHTML = submitted && answers.join('')===code ? `<div class="submitbox done"><div><b>✓ Your responses have been submitted.</b><div class="small">Thank you, ${esc(person.name)}. Read about your type below.</div></div></div>` : '';
+}
+function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+const SECTIONS = [
+ ["intro","Introduction"],["rare","How Rare Is This Type?"],["sw","Strengths & Weaknesses"],["love","Romantic Relationships"],
+ ["friend","Friendships"],["parent","Parenthood"],["career","Career Paths"],
+ ["work","Workplace Habits"],["concl","Conclusion"]
+];
+
+let step=0, answers=[null,null,null,null], cur=null, sec=0;
+
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');window.scrollTo(0,0);}
+function go(i){step=i;renderQ();show('s-q');}
+function renderQ(){
+  const q=Q[step];
+  document.getElementById('bar').style.width=((step)/Q.length*100)+'%';
+  document.getElementById('qnum').textContent=`Question ${step+1} of ${Q.length} · ${q.dim}`;
+  document.getElementById('qtext').textContent=q.q;
+  document.getElementById('qhelp').textContent=q.help;
+  const o=document.getElementById('opts');o.innerHTML='';
+  ['a','b'].forEach(k=>{
+    const b=document.createElement('button');b.className='opt'+(answers[step]===q[k].l?' sel':'');
+    b.innerHTML=`<div class="t">(${k}) ${q[k].t}</div><div class="d">${q[k].d}</div><span class="k">${q[k].l} · ${LETTER[q[k].l][0]}</span>`;
+    b.onclick=()=>{answers[step]=q[k].l;renderQ();};
+    o.appendChild(b);
+  });
+  const n=document.getElementById('next');n.disabled=!answers[step];
+  n.textContent=step===Q.length-1?'Finish →':'Next →';
+}
+function next(){ if(step<Q.length-1){step++;renderQ();} else showSubmit(); }
+function reveal(){ const code=answers.join(''); fromQuiz=true; submitted=true; location.hash=code.toLowerCase(); showType(code,false); }
+/* Can this page send data to Google directly? (Yes when opened as a downloaded file;
+   no inside the online viewer, which blocks outside connections; then a new tab is used.) */
+let DIRECT=false;
+fetch('https://docs.google.com/favicon.ico',{mode:'no-cors',cache:'no-store'}).then(()=>{DIRECT=true;setSubmitNote();}).catch(()=>{});
+function setSubmitNote(){
+  const n=document.getElementById('submitNote'); if(!n) return;
+  n.innerHTML = DIRECT ? 'Tap the button to submit your responses. Your result will appear right here.'
+    : 'When you tap the button, a Google page opens in a new tab confirming <b>"Your response has been recorded"</b>. <b>Then come back to this tab</b>: your result will be waiting here.';
+}
+function showSubmit(){
+  const code=answers.join(''), link=formLink(code), b=document.getElementById('unlockBtn');
+  if(!link){ reveal(); return; }
+  b.href=link; setSubmitNote();
+  b.onclick=(e)=>{
+    document.getElementById('blockedMsg').style.display='none';
+    if(DIRECT){
+      e.preventDefault(); b.textContent='Submitting…'; b.style.pointerEvents='none';
+      fetch(link,{mode:'no-cors'}).catch(()=>{}).finally(()=>{ b.textContent='Submit & see my result →'; b.style.pointerEvents=''; reveal(); });
+    } else {
+      /* Unlock only if the Google page really opened (this tab goes to the background).
+         If nothing opened, e.g. a phone's file preview, keep the result locked and explain. */
+      let left=false, done=false;
+      const away=()=>{ left=true; };
+      const back=()=>{ if(left && !done && !document.hidden){ done=true; cleanup(); reveal(); } };
+      const cleanup=()=>{ document.removeEventListener('visibilitychange',vis); window.removeEventListener('blur',away); window.removeEventListener('focus',back); };
+      const vis=()=>{ document.hidden ? away() : back(); };
+      document.addEventListener('visibilitychange',vis); window.addEventListener('blur',away); window.addEventListener('focus',back);
+      setTimeout(()=>{ if(!left && !done){ done=true; cleanup(); blocked(); } },4000);
+    }
+  };
+  document.getElementById('blockedMsg').style.display='none';
+  show('s-submit');
+}
+function blocked(){
+  const m=document.getElementById('blockedMsg'); m.style.display='block';
+}
+function back(){ if(step>0){step--;renderQ();} else show('s-start'); }
+function restart(){answers=[null,null,null,null];fromQuiz=false;history.replaceState(null,'',location.pathname);show('s-start');}
+
+function showType(code,fromSelect){
+  cur=code; sec=0; const t=T[code], g=GROUPS[groupOf(code)];
+  if(fromSelect){ location.hash=code.toLowerCase(); fromQuiz=false; }
+  const mine = fromQuiz && answers.join('')===code;
+  document.getElementById('typeSel').value=code;
+  const hero=document.getElementById('hero'); hero.style.background=g[1];
+  hero.innerHTML=`<div class="small" style="color:#fff;opacity:.9">${mine?(person.name?esc(person.name.split(' ')[0])+', your':'Your')+' personality type is':'Personality type'}</div>
+   <div class="code">${code}</div><div class="name">${t.name}</div><div class="grp">${g[0]} · ${t.tag}</div>
+   <div class="letters">${code.split('').map(l=>`<div><b>${l}</b>${LETTER[l][0]}<div class="small" style="color:#fff;opacity:.85">${LETTER[l][1]}</div></div>`).join('')}</div>`;
+  document.getElementById('extLink').innerHTML=`Want more depth? Read the full profile on <a href="https://www.16personalities.com/${code.toLowerCase()}-personality" target="_blank" rel="noopener">16Personalities (${code}) ↗</a>`;
+  renderSubmit(code); renderSec(); show('s-res');
+}
+function renderSec(){
+  const t=T[cur], code=cur;
+  document.getElementById('sideNav').innerHTML=SECTIONS.map((s,i)=>`<button class="${i===sec?'act':''}" onclick="sec=${i};renderSec();document.querySelector('.content').scrollIntoView({behavior:'smooth'})"><span>${s[1]}</span><span>→</span></button>`).join('');
+  const id=SECTIONS[sec][0]; let h=`<h2>${SECTIONS[sec][1]}</h2>`;
+  const li=a=>'<ul>'+a.map(x=>`<li>${x}</li>`).join('')+'</ul>';
+  if(id==='intro') h+=`<div class="kicker">Who is the ${code} – ${t.name}?</div>
+    <p><b>${code} (${t.name.replace('The ','')})</b> is a personality type with the ${code.split('').map(l=>LETTER[l][0]).join(', ').replace(/, ([^,]*)$/,' and $1')} traits. ${t.intro}</p>
+    <div class="pull">${t.tag}</div><p>${t.more}</p>`;
+  if(id==='rare'){
+    const sorted=Object.entries(RARITY).sort((a,b)=>a[1]-b[1]);
+    const rank=sorted.findIndex(x=>x[0]===code)+1, pct=RARITY[code], max=sorted[15][1];
+    const oneIn=Math.round(100/pct);
+    const label = rank<=4?'One of the rarest types':rank<=9?'A less common type':rank<=12?'A fairly common type':'One of the most common types';
+    const col=c=>GROUPS[groupOf(c)][1];
+    h+=`<div class="kicker">${label}</div>
+     <p><b>${code}s make up about ${pct}% of the population</b>, roughly <b>1 in every ${oneIn} people</b>. That makes ${code} the <b>${rank}${['th','st','nd','rd'][(rank%10>3||[11,12,13].includes(rank%100))?0:rank%10]} rarest</b> of the 16 types.</p>
+     <div class="rare-stat"><div><b>${pct}%</b>of people</div><div><b>1 in ${oneIn}</b>people share this type</div><div><b>#${rank} of 16</b>rarest to most common</div></div>
+     <h3>All 16 types, rarest to most common</h3>
+     ${sorted.map(([c,v])=>`<div class="rrow ${c===code?'me':''}"><span>${c}</span><div class="track"><div class="fill" style="width:${v/max*100}%;background:${col(c)}"></div></div><span class="pct">${v}%</span></div>`).join('')}
+     <h3>What this means</h3>
+     <p>${rank<=4?`Because ${code}s are rare, they may often feel that people around them think differently. That can make them stand out, and it also means they bring a perspective most teams lack.`:rank<=9?`${code}s are not rare, but they are outnumbered by the most common types. They will meet like-minded people, though not in every room.`:`${code}s are common, so they usually find people who think like them. Their strengths are familiar and widely valued in teams.`}</p>
+     <p class="small">Rare does not mean better, and common does not mean ordinary. These figures come from the MBTI Manual's US national sample. The mix of types in India, or in any one workplace, may differ.</p>`;
+  }
+  if(id==='sw') h+=`<div class="two"><div class="box g"><h3>Strengths</h3>${li(t.s)}</div><div class="box r"><h3>Weaknesses</h3>${li(t.w)}</div></div>
+    <p class="small" style="margin-top:16px">Remember: these describe natural tendencies up to age 21. Many people have since worked on their weaker side and become more balanced.</p>`;
+  if(id==='love') h+=`<p>${t.love}</p>`;
+  if(id==='friend') h+=`<p>${t.friend}</p>`;
+  if(id==='parent') h+=`<p>${t.parent}</p>`;
+  if(id==='career') h+=`<p>Careers that often suit ${code}s:</p><div class="tags">${t.careers.map(c=>`<span>${c}</span>`).join('')}</div><p>${t.cnote}</p>
+    <p class="small">Type indicates what may come naturally, not what someone can or cannot do. People of every type succeed in every field.</p>`;
+  if(id==='work') h+=`<h3>As a colleague</h3><p>${t.col}</p><h3>As a manager</h3><p>${t.mgr}</p><h3>As a team member</h3><p>${t.sub}</p>`;
+  if(id==='concl') h+=`<p>${code}s bring a distinctive set of strengths to every team and relationship: ${t.s.slice(0,2).map(x=>x.split(':')[0].toLowerCase()).join(' and ')}. Like every type, they have blind spots. Growth doesn't mean changing your type. It means borrowing skills from the opposite preferences when a situation calls for them.</p>
+    <h3>Growth tips for becoming more balanced</h3>${li(t.grow)}
+    <div class="note blue">Your type describes your <b>natural starting point</b>. The person you are today is that starting point plus every skill you have chosen to build.</div>`;
+  h+=`<div class="pager">${sec>0?`<button class="btn ghost" onclick="sec--;renderSec()">← ${SECTIONS[sec-1][1]}</button>`:'<span></span>'}${sec<SECTIONS.length-1?`<button class="btn" onclick="sec++;renderSec()">${SECTIONS[sec+1][1]} →</button>`:`<button class="btn" onclick="restart()">Retake quiz</button>`}</div>`;
+  document.getElementById('content').innerHTML=h;
+}
+
+// init
+document.getElementById('typeSel').innerHTML=Object.keys(T).map(k=>`<option value="${k}">${k} – ${T[k].name}</option>`).join('');
+function fromHash(){const c=(location.hash||'').slice(1).toUpperCase(); if(T[c]) showType(c,false);}
+window.addEventListener('hashchange',fromHash); fromHash();
+</script>
+</body>
+</html>
